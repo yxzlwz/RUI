@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Index</title>
+	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="Cache-Control" content="no-cache, must-revalidate">
+	<meta http-equiv="Expires" content="0">
+</head>
+<body>
+	<input type="text" name="data" id="data" placeholder="请输入识别码">
+	<input type="button" name="submit" id="submit" value="开始" onClick="start();">
+	<span>警告：使用此网页可能导致电脑严重卡顿，请谨慎！</span>
+	<div id="image1">
+	</div>
+	<div id="image2">
+	</div>
+	<script type="text/javascript">
+		let rand = 45364;
+		const box1 = document.getElementById("image1");
+		const box2 = document.getElementById("image2");
+		let input;
+
+		function start() {
+			input=document.getElementById("data").value;
+			box1.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=0 onload="loads1()">';
+		}
+		function loads1() {
+			box1.style.height="1000px";
+			box1.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=800>';
+			rand = Math.random();
+			box2.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=100 onload="loads2()" onerror="error2()">';
+			box2.style.height="0px";
+		}
+		function loads2() {
+			box2.style.height="1000px";
+			box2.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=800>';
+			rand = Math.random();
+			box1.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=100 onload="loads1()" onerror="error1()">';
+			box1.style.height="0px";
+		}
+		function error1() {
+			box1.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=100 onload="loads1()" onerror="error1()">';
+		}
+		function error2() {
+			box2.innerHTML = '<img src="/static/' + input + '.jpg?_t=' + rand + '" width=100 onload="loads2()" onerror="error2()">';
+		}
+	</script>
+</body>
+</html>
