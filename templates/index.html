@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<meta http-equiv="pragma" content="no-cache">
+<meta http-equiv="Cache-Control" content="no-cache,must-revalidate">
+<meta http-equiv="Expires" content="0">
+<html>
+<head>
+    <title>Index</title>
+</head>
+<body>
+	<label for="data">识别码:</label>
+	<input type="text" name="data" id="data" form="hi">
+	<input type="button" name="submit" id="submit" value="提交" onclick="tanchu()">
+	<form action="key" method="post" target="iframe" id="hi">
+		<input type="text" id ="keey" name="keey">
+		<input type="submit" value="提交">
+	</form>
+	<iframe id="iframe" name="iframe" style="display:none;"></iframe>
+	<div id="altContent">
+	</div>
+	<div id="altContentt">
+	</div>
+	<script src="https://cdn.staticfile.org/jquery/3.2.1/jquery.min.js"></script>
+	<script type="text/javascript">
+		var suiji = 45364;
+		var box = document.getElementById("altContent");
+		var boxx = document.getElementById("altContentt");
+		var shuru = "";
+		var i = 0;
+		function tanchu() {
+			shuru = document.getElementById("data").value;
+			$("form").attr("action", $("form").attr("action") + "?code=" + shuru);
+			box.style.height = "1000px";
+			box.innerHTML = '<img src="/static/' + shuru + '.jpg?_t=' + suiji + '" onload="myFunction()">';
+		}
+		function myFunction() {
+			box.style.height = "1000px";
+			suiji = Math.random();
+			boxx.innerHTML = '<img src="/static/' + shuru + '.jpg?_t=' + suiji + '" width=800 onload="myyFunction()" onerror="myyFunctionerror()">';
+			boxx.style.height = "0px";
+		}
+		function myyFunction() {
+			boxx.style.height = "1000px";
+			suiji = Math.random();
+			box.innerHTML = '<img src="/static/' + shuru + '.jpg?_t=' + suiji + '" width=800 onload="myFunction()" onerror="myFunctionerror()">';
+			box.style.height = "0px";
+		}
+		function myFunctionerror() {
+            suiji = Math.random();
+			box.innerHTML = '<img src="/static/' + shuru + '.jpg?_t=' + suiji + '" width=800 onload="myFunction()" onerror="myFunctionerror()">';
+		}
+		function myyFunctionerror() {
+            suiji = Math.random();
+			boxx.innerHTML = '<img src="/static/' + shuru + '.jpg?_t=' + suiji + '" width=800 onload="myyFunction()" onerror="myyFunctionerror()">';
+		}
+	</script>
+</body>
+</html>
