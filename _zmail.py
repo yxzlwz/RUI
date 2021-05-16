@@ -1,3 +1,5 @@
+import random
+import time
 import zmail
 
 def send_mail(from_address, from_password, to_address,
@@ -5,7 +7,7 @@ def send_mail(from_address, from_password, to_address,
               from_name="RBSI"):
     mail_content = {
         "subject": title,
-        "content_html": "<h1>%s</h1>" % content,
+        "content_html": "<p>%s</p><br /><p>本次发信识别码：%s %s</p>" % (content, random.random(), time.time()),
         "from": "%s <%s>" % (from_name, from_address)
     }
 
