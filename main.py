@@ -181,6 +181,7 @@ while True:
 
             if not waited:
                 time.sleep(5)
+                
     except KeyboardInterrupt:
         send_message("邮件轰炸成功发送！")
     except SystemExit:
