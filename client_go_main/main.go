@@ -3,14 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"image/png"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
 
 	"github.com/axgle/mahonia"
-	"github.com/kbinani/screenshot"
 
 	"os/exec"
 
@@ -23,21 +21,6 @@ const (
 
 var PATH, DIR string
 var TRIED bool = false
-
-func get_screenshot() {
-	bounds := screenshot.GetDisplayBounds(0)
-	img, err := screenshot.CaptureRect(bounds)
-	if err != nil {
-		panic(err)
-	}
-	file, err := os.Create(DIR + `\screen.png`)
-	if err != nil {
-		panic(err)
-	}
-	defer file.Close()
-	png.Encode(file, img)
-	fmt.Println("截图成功！")
-}
 
 func get_cmd(cmdStr string) string {
 	list := strings.Split(cmdStr, " ")
@@ -118,7 +101,6 @@ func main() {
 	get_cmd(`sc config ` + ServiceName + ` type= interact type= own`)
 
 	go run_cmd_file(`mshta vbscript:msgbox("启动成功",64,"RBSI4.0")(window.close)`)
-	// get_screenshot()
 
 	install()
 
