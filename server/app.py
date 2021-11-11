@@ -1,18 +1,15 @@
+# 该文件无需自定义（更新config即可）
+
 from flask import *
 import json
 import os
 import time
 
-version = 1
-python_full = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/static/RBSI.exe"
-go_install = ""
-python_with_go = ""
-go_full = ""
+from config import *
 
 thisDir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
-app.secret_key = "RBSI"
-password = app.secret_key
+app.secret_key = password
 connects = {}
 not_connect = {}
 commands = []
@@ -40,7 +37,8 @@ def format_time():
 @app.route("/", methods=["POST", "GET"])
 def index():
     global connects, not_connect
-    if request.method == "POST" and request.form.get("password") == password:
+    if request.method == "POST" and request.form.get(
+            "password") == app.secret_key:
         session["admin"] = "admin"
     if not session.get("admin"):
         return render_template("login.html")
@@ -54,10 +52,15 @@ def index():
         else:
             not_connect[i] = j
     connects = _connects
-    return render_template("index.html", connects=connects, not_connect=not_connect,
-                           another_name=get_another_name(), count=count,
-                           version=version, download_address=python_full,
-                           time=time.time, round=round)
+    return render_template("index.html",
+                           connects=connects,
+                           not_connect=not_connect,
+                           another_name=get_another_name(),
+                           count=count,
+                           version=version,
+                           download_address=python_full,
+                           time=time.time,
+                           round=round)
 
 
 @app.route("/upload", methods=["POST"])
@@ -76,7 +79,11 @@ def start():
     if not messages.get(request.form["name"]):
         messages[request.form["name"]] = []
     print("新的设备（%s）成功连接到服务器" % request.form["name"])
-    result = {"action": len(commands), "version": version, "download_address": python_full}
+    result = {
+        "action": len(commands),
+        "version": version,
+        "download_address": python_full
+    }
     return json.dumps(result)
 
 
@@ -91,8 +98,9 @@ def set_another_name():
 @app.route("/message", methods=["GET", "POST"])
 def message():
     if request.method == "POST":
-        messages[request.form["name"]] = [format_time() + "&emsp;&emsp;" + request.form.get("message")] + messages[
-            request.form["name"]]
+        messages[request.form["name"]] = [
+            format_time() + "&emsp;&emsp;" + request.form.get("message")
+        ] + messages[request.form["name"]]
         messages[request.form["name"]] = messages[request.form["name"]][:50]
         return "Success"
     else:
@@ -141,9 +149,13 @@ def connect():
 def sub_action():
     if not session.get("admin"):
         return redirect("/")
-    commands.append({"command": request.form.get("command"),
-                     "send_to": request.form.get("send_to").replace("\t", "").split(";")
-                     if request.form.get("send_to") else ["all"]})
+    commands.append({
+        "command":
+        request.form.get("command"),
+        "send_to":
+        request.form.get("send_to").replace("\t", "").split(";")
+        if request.form.get("send_to") else ["all"]
+    })
     return redirect("/")
 
 
@@ -215,9 +227,21 @@ def sub_show_version():
 
 
 @app.route("/d")
-def get_download():
-    return redirect(python_full)
+def get_downloads():
+    return render_template("download.html",
+                           python_full=python_full,
+                           python_with_go=python_with_go,
+                           go_full=go_full,
+                           go_install=go_install)
+
+
+@app.route("/d/<name>")
+def get_download(name):
+    if name in ["python_full", "python_with_go", "go_full", "go_install"]:
+        return eval(name)
+    else:
+        abort(404)
 
 
 if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5001)
+    app.run(debug=debug, host=host, port=port)

