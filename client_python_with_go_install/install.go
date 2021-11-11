@@ -1,4 +1,4 @@
-// 该文件自定义方式：设置常量值即可
+// 该文件自定义方式：设置22-24行常量值即可
 
 package main
 
@@ -19,9 +19,9 @@ import (
 )
 
 const (
-	ServerAddr  = ""
-	DownloadUrl = ""
-	ServiceName = "ATest"
+	ServerAddr  = ""  // 你的server端域名，格式如"http://rbsi.yxzl.top:5002/"
+	DownloadUrl = ""  // 你的Python主进程http下载地址
+	ServiceName = "ATest"  // 注册的服务名称
 )
 
 var (
