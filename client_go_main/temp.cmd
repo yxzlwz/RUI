@@ -1,0 +1,1 @@
+mshta vbscript:msgbox("Æô¶¯³É¹¦",64,"RBSI4.0")(window.close)

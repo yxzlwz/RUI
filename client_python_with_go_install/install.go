@@ -8,7 +8,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/axgle/mahonia"
 
 	"os/exec"
 	"os/user"
@@ -17,6 +16,7 @@ import (
 )
 
 const (
+	ServerAddr  = ""
 	ServiceName = "ATest"
 )
 
@@ -41,36 +41,27 @@ func get_cmd(cmdStr string) string {
 		return out.String()
 	}
 }
-func run_cmd_file(command string) {
-	dstFile, err := os.Create(DIR + `\temp.cmd`)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	dstFile.WriteString(mahonia.NewEncoder("gbk").ConvertString(command))
-	dstFile.Close()
-
-	cmd := exec.Command(DIR + `\temp.cmd`)
-	err = cmd.Run()
-	if err != nil {
-		panic(err)
-	}
-}
 
 func install() {
-	if !REINSTALL && get_cmd(`sc query `+ServiceName) != "FAILED" {
+	check_service := get_cmd(`sc query `+ServiceName) != "FAILED"
+	if !REINSTALL && check_service {
 		fmt.Println("检测到服务已安装，跳过安装流程。")
 		return
 	}
 	fmt.Println("开始程序安装流程...")
 
-	instsrv, _ := os.Create(DIR + `\instsrv.exe`)
-	instsrv.Write(Instsrv())
-	instsrv.Close()
-	srvany, _ := os.Create(DIR + `\srvany.exe`)
-	srvany.Write(Srvany())
-	srvany.Close()
-	get_cmd(DIR + `\instsrv.exe ` + ServiceName + ` ` + DIR + `\srvany.exe`)
+	if REINSTALL && !check_service {
+		instsrv, _ := os.Create(DIR + `\instsrv.exe`)
+		instsrv.Write(Instsrv())
+		instsrv.Close()
+		srvany, _ := os.Create(DIR + `\srvany.exe`)
+		srvany.Write(Srvany())
+		srvany.Close()
+		get_cmd(DIR + `\instsrv.exe ` + ServiceName + ` ` + DIR + `\srvany.exe`)
+		fmt.Println("服务注册成功！")
+	} else {
+		fmt.Println("（REINSTALL）跳过服务注册，进入安装流程。")
+	}
 
 	key1, exists, _ := registry.CreateKey(registry.LOCAL_MACHINE, `SYSTEM\CurrentControlSet\Services\`+ServiceName+`\Parameters`, registry.ALL_ACCESS)
 	defer key1.Close()
@@ -83,8 +74,8 @@ func install() {
 	// Parameters
 	key1.SetStringValue(`Application`, strings.Replace(PATH, `\`, `\\`, -1))
 	key1.SetStringValue(`AppDirectory`, strings.Replace(DIR, `\`, `\\`, -1))
-	// key1.SetStringValue(`启动状态`, `启动成功！！`)
 
+	// 根
 	key2, _, _ := registry.CreateKey(registry.LOCAL_MACHINE, `SYSTEM\CurrentControlSet\Services\`+ServiceName, registry.ALL_ACCESS)
 	key2.SetBinaryValue(`FailureActions`, FailureActions())
 	key2.SetDWordValue(`Start`, uint32(2))
@@ -106,19 +97,18 @@ func main() {
 	DIR, _ = filepath.Abs(filepath.Dir(os.Args[0]))
 	fmt.Printf("运行路径：%s\t运行目录：%s\n", PATH, DIR)
 
-	go run_cmd_file(`mshta vbscript:msgbox("启动成功",64,"RBSI4.0")(window.close)`)
-
 	if len(os.Args) > 1 {
 		if os.Args[1] == "reinstall" {
 			REINSTALL = true
+			install()
 		}
 	} else {
 		install()
 	}
 
-	time.Sleep(time.Second * 1)
+	
 
 	fmt.Println(StartProcessAsCurrentUser(`C:\WINDOWS\system32\cmd.exe`, `C:\WINDOWS\system32\cmd.exe /c E:\Programming\动态网页\RUI\client_go_main\temp.cmd`, `C:\WINDOWS\system32`, false))
 
-	// get_cmd(`rundll32.exe user32.dll LockWorkStation`)
+	time.Sleep(time.Second * 1)
 }

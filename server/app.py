@@ -4,7 +4,10 @@ import os
 import time
 
 version = 1
-download_address = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/static/RBSI.exe"
+python_full = "http://YOUR_SERVER_HOST:YOUR_SERVER_PORT/static/RBSI.exe"
+go_install = ""
+python_with_go = ""
+go_full = ""
 
 thisDir = os.path.dirname(os.path.abspath(__file__))
 app = Flask(__name__)
@@ -53,7 +56,7 @@ def index():
     connects = _connects
     return render_template("index.html", connects=connects, not_connect=not_connect,
                            another_name=get_another_name(), count=count,
-                           version=version, download_address=download_address,
+                           version=version, download_address=python_full,
                            time=time.time, round=round)
 
 
@@ -73,7 +76,7 @@ def start():
     if not messages.get(request.form["name"]):
         messages[request.form["name"]] = []
     print("新的设备（%s）成功连接到服务器" % request.form["name"])
-    result = {"action": len(commands), "version": version, "download_address": download_address}
+    result = {"action": len(commands), "version": version, "download_address": python_full}
     return json.dumps(result)
 
 
@@ -192,7 +195,7 @@ def sub_stop_forever():
         for i in request.form["name"].split(";"):
             stop["forever"].append(i.replace("\t", ""))
     if request.form.get("reopen"):
-        for i in request.form["name"].split(";"):
+        for i in request.form["reopen"].split(";"):
             try:
                 stop["forever"].remove(i.replace("\t", ""))
             except:
@@ -213,7 +216,7 @@ def sub_show_version():
 
 @app.route("/d")
 def get_download():
-    return redirect(download_address)
+    return redirect(python_full)
 
 
 if __name__ == "__main__":
