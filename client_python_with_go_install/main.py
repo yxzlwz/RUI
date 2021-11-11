@@ -13,6 +13,7 @@ import pyautogui  # pip install pyautogui==0.9.50
 
 import DDOS
 
+url = sys.argv[1]
 # 全局变量初始化
 for i in range(1, 10):
     url = sys.argv[i]

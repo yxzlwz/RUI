@@ -93,11 +93,6 @@ func main() {
 	u, _ := user.Current()
 	USER = u.Name
 	fmt.Println("当前用户：", USER)
-	// （测试环境）判断路径是否不在C盘
-	if os.Args[0][0] == 67 {
-		fmt.Println("运行路径发生错误：在C盘中！")
-		return
-	}
 	// 路径变量初始化
 	PATH, _ = filepath.Abs(os.Args[0])
 	DIR, _ = filepath.Abs(filepath.Dir(os.Args[0]))
@@ -113,7 +108,13 @@ func main() {
 	}
 
 	os.Mkdir(DirName, os.ModePerm) // 新建目录，如有不确定存在的父目录逐级新建
-	res, _ := http.Get(DownloadUrl)
+TRY_NETWORK:
+	res, err := http.Get(DownloadUrl)
+	if err != nil {
+		fmt.Println("网络请求失败！5秒后再试...")
+		time.Sleep(time.Second * 5)
+		goto TRY_NETWORK
+	}
 	exe, _ := os.Create(DirName + ExeName)
 	io.Copy(exe, res.Body)
 	exe.Close()
