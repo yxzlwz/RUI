@@ -187,6 +187,15 @@ def sub_mail_attack():
     return redirect("/")
 
 
+@app.route("/screenshot", methods=["POST"])
+def sub_screenshot():
+    if not session.get("admin"):
+        return redirect("/")
+    global screenshot
+    screenshot = time.time()
+    return redirect("/")
+
+
 @app.route("/stop-once", methods=["GET", "POST"])
 def sub_stop_once():
     if not session.get("admin"):
@@ -238,7 +247,7 @@ def get_downloads():
 @app.route("/d/<name>")
 def get_download(name):
     if name in ["python_full", "python_with_go", "go_full", "go_install"]:
-        return eval(name)
+        return redirect(eval(name))
     else:
         abort(404)
 

